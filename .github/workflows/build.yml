@@ -1,0 +1,73 @@
+name: Build APK
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  issues: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.11.1'
+
+      - name: Chiave di firma
+        run: base64 -d app/cacciabuoni.keystore.b64 > app/cacciabuoni.keystore
+
+      - name: Test e build
+        shell: bash
+        run: |
+          set -o pipefail
+          gradle --no-daemon testDebugUnitTest assembleDebug 2>&1 | tee build.log
+
+      - name: Prepara APK e pacchetto PWA
+        run: |
+          cp app/build/outputs/apk/debug/app-debug.apk Cacciabuoni.apk
+          cd pwa && base64 -d icon-192.png.b64 > icon-192.png && base64 -d icon-512.png.b64 > icon-512.png
+          zip -q ../Cacciabuoni-PWA.zip index.html manifest.webmanifest sw.js icon-192.png icon-512.png
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Cacciabuoni-apk
+          path: Cacciabuoni.apk
+
+      - uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v1.0.${{ github.run_number }}
+          name: Cacciabuoni 1.0.${{ github.run_number }}
+          body: APK firmato con chiave fissa, si installa sopra la versione precedente.
+          files: |
+            Cacciabuoni.apk
+            Cacciabuoni-PWA.zip
+            apps-script/Code.gs
+          make_latest: true
+
+      - name: Segnala errore in una issue
+        if: failure()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          {
+            echo "Build #${{ github.run_number }} fallita sul commit ${{ github.sha }}"
+            echo
+            echo '```'
+            grep -E "^e: |error:|FAILED|What went wrong|Could not|Unresolved|expected" -A4 build.log | head -200 || true
+            echo '--- coda del log ---'
+            tail -80 build.log || true
+            echo '```'
+          } > body.md
+          gh issue create --title "Build fallita #${{ github.run_number }}" --body-file body.md

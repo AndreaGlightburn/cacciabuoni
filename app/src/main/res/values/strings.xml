@@ -1,0 +1,6 @@
+<resources>
+    <string name="app_name">Cacciabuoni</string>
+    <string name="watcher_label">Cacciabuoni – avviso negozi</string>
+    <string name="watcher_desc">Riconosce solo quale app hai aperto (non legge lo schermo) per avvisarti se hai buoni o cashback per quel negozio.</string>
+    <string name="widget_label">Buoni in scadenza</string>
+</resources>

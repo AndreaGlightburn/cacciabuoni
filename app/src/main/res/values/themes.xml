@@ -1,0 +1,8 @@
+<resources>
+    <style name="Theme.Cacciabuoni" parent="android:Theme.Material.Light.NoActionBar">
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:windowBackground">@color/bg</item>
+    </style>
+    <color name="bg">#F6F5F1</color>
+    <color name="teal">#0F766E</color>
+</resources>

@@ -1,0 +1,486 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Cacciabuoni</title>
+<meta name="theme-color" content="#0f766e">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<style>
+:root{--bg:#f6f5f1;--card:#fff;--ink:#1c1b19;--mute:#6b6862;--line:#e4e1da;--acc:#0f766e;--acc-ink:#fff;--warn:#c2410c;--warn-bg:#fff1e6;--hot:#b91c1c;--hot-bg:#fde8e8;--ok-bg:#e6f4f1;--chip:#efede7;--shadow:0 1px 2px rgba(0,0,0,.05)}
+@media (prefers-color-scheme:dark){:root{--bg:#141413;--card:#1e1d1b;--ink:#ecebe7;--mute:#9b978f;--line:#2f2e2b;--acc:#2dd4bf;--acc-ink:#062a26;--warn:#fb923c;--warn-bg:#3a2414;--hot:#f87171;--hot-bg:#3b1717;--ok-bg:#12302c;--chip:#2a2926;--shadow:none}}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.4 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+button,input,textarea{font:inherit;color:inherit}
+header{position:sticky;top:0;z-index:5;background:var(--bg);padding:calc(env(safe-area-inset-top) + 10px) 16px 8px;border-bottom:1px solid var(--line)}
+.top{display:flex;align-items:center;gap:8px}
+h1{font-size:20px;margin:0;flex:1;letter-spacing:-.01em}
+h1 b{color:var(--acc)}
+.ib{border:0;background:var(--chip);width:38px;height:38px;border-radius:10px;font-size:18px;cursor:pointer}
+.search{margin-top:10px;position:relative}
+.search input{width:100%;padding:11px 12px 11px 36px;border:1px solid var(--line);border-radius:12px;background:var(--card)}
+.search span{position:absolute;left:12px;top:10px;color:var(--mute)}
+.tabs{display:flex;gap:6px;margin-top:10px}
+.tab{flex:1;border:0;background:transparent;padding:8px 4px;border-radius:10px;color:var(--mute);font-weight:600;cursor:pointer}
+.tab.on{background:var(--card);color:var(--ink);box-shadow:var(--shadow);outline:1px solid var(--line)}
+.tab small{font-weight:500;opacity:.7}
+main{padding:12px 16px 110px;max-width:720px;margin:0 auto}
+.chips{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;margin-bottom:10px;scrollbar-width:none}
+.chip{border:1px solid var(--line);background:var(--card);border-radius:999px;padding:5px 12px;white-space:nowrap;cursor:pointer;font-size:13px}
+.chip.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 14px;margin-bottom:10px;box-shadow:var(--shadow)}
+.card.used{opacity:.55}
+.row{display:flex;align-items:center;gap:8px}
+.store{font-weight:700;font-size:16px;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.val{background:var(--ok-bg);color:var(--acc);font-weight:700;border-radius:8px;padding:2px 8px;font-size:14px;white-space:nowrap}
+.code{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:10px 0 6px;border:1.5px dashed var(--acc);border-radius:10px;padding:8px 10px;cursor:pointer;background:transparent;width:100%;text-align:left}
+.code b{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:16px;letter-spacing:.04em;word-break:break-all}
+.code em{font-style:normal;color:var(--acc);font-size:13px;font-weight:600;white-space:nowrap}
+.meta{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px;font-size:13px;color:var(--mute)}
+.exp{border-radius:6px;padding:1px 7px;font-size:12.5px;font-weight:600;background:var(--chip);color:var(--mute)}
+.exp.hot{background:var(--hot-bg);color:var(--hot)}
+.exp.warn{background:var(--warn-bg);color:var(--warn)}
+.where{font-size:13px;margin-top:6px}
+.subj{font-size:12.5px;color:var(--mute);margin-top:4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.acts{display:flex;gap:6px;margin-top:10px}
+.act{border:1px solid var(--line);background:transparent;border-radius:8px;padding:5px 10px;font-size:13px;cursor:pointer;text-decoration:none;color:var(--ink)}
+.act.pri{background:var(--acc);color:var(--acc-ink);border-color:var(--acc)}
+.src{font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--mute)}
+.note{font-size:12.5px;color:var(--mute);margin-top:4px}
+.empty{text-align:center;color:var(--mute);padding:40px 10px}
+.empty b{display:block;color:var(--ink);font-size:16px;margin-bottom:6px}
+.panel{background:var(--ok-bg);border-radius:14px;padding:12px 14px;margin-bottom:12px}
+.panel h3{margin:0 0 6px;font-size:15px}
+.panel ul{margin:0;padding-left:18px;font-size:14px}
+.panel .warn{color:var(--warn);font-size:13px;margin-top:6px}
+.panel .links{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.big{display:flex;gap:10px;margin-bottom:12px}
+.big .card{flex:1;margin:0}
+.big .n{font-size:26px;font-weight:800;color:var(--acc)}
+.status{font-size:12px;color:var(--mute);text-align:center;margin:4px 0 12px}
+.fab{position:fixed;right:18px;bottom:calc(18px + env(safe-area-inset-bottom));width:58px;height:58px;border-radius:18px;border:0;background:var(--acc);color:var(--acc-ink);font-size:30px;box-shadow:0 4px 14px rgba(0,0,0,.2);cursor:pointer}
+dialog{border:0;border-radius:18px;padding:0;width:min(560px,94vw);background:var(--card);color:var(--ink)}
+dialog::backdrop{background:rgba(0,0,0,.45)}
+.dlg{padding:18px}
+.dlg h2{margin:0 0 12px;font-size:18px}
+label{display:block;font-size:13px;color:var(--mute);margin:10px 0 4px}
+.dlg input,.dlg textarea{width:100%;padding:10px;border:1px solid var(--line);border-radius:10px;background:var(--bg)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.dlg .acts{justify-content:flex-end;margin-top:16px}
+.tools{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px}
+.toast{position:fixed;left:50%;bottom:90px;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:9px 16px;border-radius:999px;font-size:14px;opacity:0;transition:opacity .2s;pointer-events:none;z-index:20}
+.toast.on{opacity:1}
+.hint{font-size:12.5px;color:var(--mute);margin-top:6px}
+@media (min-width:900px){
+ header{padding-left:max(24px,calc((100vw - 1180px)/2));padding-right:max(24px,calc((100vw - 1180px)/2))}
+ .search,.tabs{max-width:1180px}
+ main{max-width:1180px;padding:16px 24px 60px;display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:12px;align-items:start}
+ main>.chips,main>.panel,main>.status,main>.empty,main>.big,main>.note{grid-column:1/-1}
+ main>.card{margin:0}
+ .fab{right:32px;bottom:32px}
+ .kbd{display:inline}
+}
+.kbd{display:none;font-size:11px;color:var(--mute);margin-left:6px}
+</style>
+</head>
+<body>
+<header>
+  <div class="top">
+    <h1>Caccia<b>buoni</b></h1>
+    <button class="ib" id="bRefresh" title="Aggiorna" aria-label="Aggiorna">↻</button>
+    <button class="ib" id="bSettings" title="Impostazioni" aria-label="Impostazioni">⚙</button>
+  </div>
+  <div class="search"><span>⌕</span><input id="q" type="search" placeholder="Cerca negozio, codice…   ( / )" autocomplete="off"></div>
+  <div class="tabs">
+    <button class="tab on" data-tab="buoni">Buoni <small id="cB"></small></button>
+    <button class="tab" data-tab="offerte">Offerte <small id="cO"></small></button>
+    <button class="tab" data-tab="cashback">Cashback</button>
+  </div>
+</header>
+<main id="main"></main>
+<button class="fab" id="bAdd" aria-label="Aggiungi buono">+</button>
+
+<dialog id="dAdd"><form class="dlg" method="dialog" id="fAdd">
+  <h2>Nuovo buono</h2>
+  <div class="tools">
+    <label class="act" style="margin:0">📷 Da foto/screenshot<input type="file" id="ocrIn" accept="image/*" hidden></label>
+    <button type="button" class="act" id="bPaste">📋 Incolla testo</button>
+  </div>
+  <div class="hint" id="ocrMsg">Per i codici dei social: fai uno screenshot o condividi il post verso Cacciabuoni.</div>
+  <textarea id="pasteTxt" rows="3" placeholder="Incolla qui il testo del post o del messaggio…" hidden></textarea>
+  <label>Negozio</label><input name="negozio" required>
+  <label>Codice</label><input name="codice" style="font-family:ui-monospace,monospace">
+  <div class="grid2">
+    <div><label>Valore</label><input name="valore" placeholder="es. 15% o 10 €"></div>
+    <div><label>Scadenza</label><input name="scadenza" type="date"></div>
+  </div>
+  <label>Dove si trova / come si usa</label><input name="dove" placeholder="es. app Esselunga › Buoni, min. 50 €">
+  <label>Note / fonte</label><input name="note" placeholder="es. storia Instagram di …">
+  <div class="acts"><button class="act" value="cancel" formnovalidate>Annulla</button><button class="act pri" value="ok">Salva</button></div>
+</form></dialog>
+
+<dialog id="dSet"><form class="dlg" method="dialog" id="fSet">
+  <h2>Collegamento</h2>
+  <label>URL app web Apps Script</label><input name="u" placeholder="https://script.google.com/macros/s/…/exec">
+  <label>Token</label><input name="t">
+  <div class="hint">Il modo più semplice è aprire il link che stampa la funzione <b>linkPWA</b>: si compila da solo.</div>
+  <label style="display:flex;align-items:center;gap:8px;color:var(--ink)"><input type="checkbox" name="notif" style="width:auto"> Notifiche per i buoni che scadono oggi o domani</label>
+  <div class="acts">
+    <button type="button" class="act" id="bScan">Ricontrolla Gmail ora</button>
+    <button class="act pri" value="ok">Salva</button>
+  </div>
+</form></dialog>
+
+<div class="toast" id="toast"></div>
+
+<script id="parser">
+const STOP = new Set(['CODICE', 'SCONTO', 'COUPON', 'PROMO', 'EXTRA', 'GRATIS', 'SUBITO', 'ACQUISTA', 'APPLICA',
+  'CARRELLO', 'CASSA', 'ORDINA', 'SCOPRI', 'VALIDO', 'BUONO', 'VOUCHER', 'OFFERTA', 'SPECIALE', 'ESCLUSIVO', 'TUTTO',
+  'NOVITA', 'BLACK', 'FRIDAY', 'CLICCA', 'SHOP', 'ONLINE', 'STORE', 'EMAIL', 'GIOCA', 'SALDI', 'DONNA', 'UOMO',
+  'BAMBINI', 'REGALO', 'ADESSO', 'RISCATTA', 'CONTROLLA', 'DETTAGLI', 'NEWSLETTER', 'EURO', 'CASHBACK', 'ORDINE',
+  'SPEDIZIONE', 'CONSEGNA', 'GRATUITA', 'PREZZO', 'PRODOTTI', 'ARTICOLI', 'ACCEDI', 'REGISTRATI', 'COPIA', 'INSERISCI']);
+
+function cleanText(s) {
+  return String(s || '')
+    .replace(/https?:\/\/[^\s)\]>"'*]+/g, ' ')
+    .replace(/<[^>\n]{0,300}>/g, ' ')
+    .replace(/\[[^\]]*\]\([^)]*\)/g, ' ')
+    .replace(/[\u034F\u200B-\u200D\uFEFF\u00AD\u2060]/g, '')
+    .replace(/[ \t\u00A0]+/g, ' ');
+}
+
+function htmlToText_(html) {
+  return String(html || '')
+    .replace(/<(style|script|head)[\s\S]*?<\/\1>/gi, ' ')
+    .replace(/<img[^>]*alt="([^"]*)"[^>]*>/gi, ' $1 ')
+    .replace(/<br\s*\/?>/gi, '\n')
+    .replace(/<\/(p|div|tr|td|th|h\d|li|table)>/gi, '\n')
+    .replace(/<[^>]+>/g, ' ')
+    .replace(/&nbsp;/g, ' ').replace(/&amp;/g, '&').replace(/&quot;/g, '"').replace(/&#39;|&rsquo;/g, "'")
+    .replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&euro;/g, '€').replace(/&#(\d+);/g, (m, n) => String.fromCharCode(+n));
+}
+
+function isCodeToken(t) {
+  if (t.length < 5 || t.length > 25) return false;
+  if (!/[A-Za-z]/.test(t)) return false;
+  if (/^\d+(gb|tb|mb|ml|kg|mm|cm|hz|mah|pz|cl)$/i.test(t)) return false;
+  if (/^(19|20)\d\d$/.test(t)) return false;
+  if (/\d/.test(t)) return true;
+  return t === t.toUpperCase() && !STOP.has(t);
+}
+
+function codeScore(t, dist) {
+  const digits = (t.match(/\d/g) || []).length;
+  return (digits >= 2 ? 3 : digits ? 1 : 0) + (t === t.toUpperCase() ? 2 : 0) + (t.length >= 6 ? 1 : 0) + (dist < 40 ? 2 : 0);
+}
+
+function extractCodes(text) {
+  const kw = /(codice(?:\s+(?:sconto|promo(?:zionale)?|coupon|del tuo buono(?:\s+personale)?|esclusivo|personale))?|coupon(?:\s+code)?|promo\s*code|voucher\s*code|discount\s*code|usa il codice)/gi;
+  const neg = /^\s*(?:modello|cliente|fiscale|carta|articolo|prodotto|ordine|postale|iban|per partecipare|gioco|N°)/i;
+  const best = {};
+  let m;
+  while ((m = kw.exec(text))) {
+    const after = text.substr(m.index + m[0].length, 110);
+    if (neg.test(after)) continue;
+    const re = /[A-Za-z0-9][A-Za-z0-9-]*[A-Za-z0-9]/g;
+    let t;
+    while ((t = re.exec(after))) {
+      const tok = t[0];
+      if (!isCodeToken(tok)) continue;
+      const s = codeScore(tok, t.index);
+      if (s >= 4 && (!best[tok] || best[tok] < s)) best[tok] = s;
+    }
+  }
+  return Object.keys(best).sort((a, b) => best[b] - best[a]).slice(0, 2);
+}
+
+const MESI = { gennaio: 1, febbraio: 2, marzo: 3, aprile: 4, maggio: 5, giugno: 6, luglio: 7, agosto: 8, settembre: 9, ottobre: 10, novembre: 11, dicembre: 12 };
+
+function mkDate_(d, mo, y, ref) {
+  let yy = y || ref.getFullYear();
+  let dt = new Date(yy, mo - 1, d);
+  if (!y && dt < new Date(ref.getFullYear(), ref.getMonth(), ref.getDate() - 1)) dt = new Date(yy + 1, mo - 1, d);
+  return dt;
+}
+
+function datesIn(s, ref) {
+  const out = [];
+  let m;
+  const re1 = /(\d{1,2})[\/.\-](\d{1,2})(?:[\/.\-](\d{2,4}))?(?![\d,])/g;
+  while ((m = re1.exec(s))) {
+    const d = +m[1], mo = +m[2];
+    if (d < 1 || d > 31 || mo < 1 || mo > 12) continue;
+    let y = m[3] ? +m[3] : null;
+    if (y !== null && y < 100) y += 2000;
+    out.push(mkDate_(d, mo, y, ref));
+  }
+  const re2 = /(\d{1,2})°?\s+(gennaio|febbraio|marzo|aprile|maggio|giugno|luglio|agosto|settembre|ottobre|novembre|dicembre)(?:\s+(\d{4}))?/gi;
+  while ((m = re2.exec(s))) out.push(mkDate_(+m[1], MESI[m[2].toLowerCase()], m[3] ? +m[3] : null, ref));
+  const re3 = /(?:fra|tra)\s+(\d{1,3})\s+giorni/gi;
+  while ((m = re3.exec(s))) out.push(new Date(ref.getFullYear(), ref.getMonth(), ref.getDate() + +m[1]));
+  return out;
+}
+
+/** Scadenza: la data più vicina (non passata rispetto alla mail) vicino a parole come "scade", "valido fino", "entro". */
+function extractExpiry(text, ref) {
+  ref = ref || new Date();
+  const kw = /(scad\w*|valid\w*|fino\s+al?|entro|utilizzabile|spendibile|utilizzat\w+|termina|until|expires?)/gi;
+  const day0 = new Date(ref.getFullYear(), ref.getMonth(), ref.getDate());
+  let best = null, m;
+  while ((m = kw.exec(text))) {
+    const win = text.substr(m.index, 70);
+    datesIn(win, ref).forEach(d => { if (d >= day0 && (!best || d < best)) best = d; });
+  }
+  return best ? iso_(best) : '';
+}
+
+function extractValue(s) {
+  s = String(s || '');
+  let m = s.match(/(\d{1,3}(?:[.,]\d{1,2})?)\s?(%|€|euro\b|eur\b)/i);
+  if (m) return m[2] === '%' ? m[1] + '%' : m[1].replace('.', ',') + ' €';
+  m = s.match(/€\s?(\d{1,4}(?:[.,]\d{1,2})?)/);
+  return m ? m[1].replace('.', ',') + ' €' : '';
+}
+
+function cashbackRate(s) {
+  const m = String(s).match(/cashback(?:\s+X\d+)?\s+(?:fino\s+al\s+|del\s+|al\s+)?(\d{1,2}(?:[.,]\d{1,2})?)\s?%/i);
+  return m ? m[1].replace(',', '.') + '%' : '';
+}
+function iso_(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
+</script>
+<script>
+const $=s=>document.querySelector(s);
+const LS={get:(k,d)=>{try{const v=localStorage.getItem('cb_'+k);return v?JSON.parse(v):d}catch(e){return d}},set:(k,v)=>{try{localStorage.setItem('cb_'+k,JSON.stringify(v))}catch(e){}}};
+let cfg=LS.get('cfg',{u:'',t:'',notif:false});
+let data=LS.get('data',{buoni:[],offerte:[],cashback:{eventi:[],saldi:{}},portali:{}});
+let queue=LS.get('queue',[]);
+let tab='buoni',filt='attivi';
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const today=()=>iso_(new Date());
+function days(isoD){if(!isoD)return null;const [y,m,d]=isoD.split('-').map(Number);const a=new Date(y,m-1,d),b=new Date();b.setHours(0,0,0,0);return Math.round((a-b)/864e5)}
+function expChip(isoD){
+  const n=days(isoD);if(n===null)return '';
+  const it=isoD.split('-').reverse().join('/');
+  if(n<0)return `<span class="exp">scaduto ${it}</span>`;
+  if(n===0)return `<span class="exp hot">scade oggi</span>`;
+  if(n===1)return `<span class="exp hot">scade domani</span>`;
+  if(n<=7)return `<span class="exp warn">tra ${n} giorni · ${it}</span>`;
+  return `<span class="exp">fino al ${it}</span>`;
+}
+function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('on');clearTimeout(t._h);t._h=setTimeout(()=>t.classList.remove('on'),2200)}
+
+/* ---------- rete ---------- */
+async function api(params){
+  const url=cfg.u+(cfg.u.includes('?')?'&':'?')+new URLSearchParams(Object.assign({token:cfg.t},params));
+  const r=await fetch(url,{redirect:'follow'});const j=await r.json();if(!j.ok)throw new Error(j.error||'errore');return j;
+}
+async function post(body){
+  const r=await fetch(cfg.u,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(Object.assign({token:cfg.t},body))});
+  const j=await r.json();if(!j.ok)throw new Error(j.error||'errore');return j;
+}
+async function flush(){
+  if(!cfg.u||!queue.length||!navigator.onLine)return;
+  const rest=[];
+  for(const b of queue){try{await post(b)}catch(e){rest.push(b)}}
+  queue=rest;LS.set('queue',queue);
+}
+function enqueue(b){queue.push(b);LS.set('queue',queue);flush()}
+async function load(){
+  if(!cfg.u){render();return}
+  setStatus('Aggiornamento…');
+  try{await flush();const j=await api({});data=j;LS.set('data',data);setStatus('Aggiornato '+fmtTime(j.aggiornato));render();notify()}
+  catch(e){setStatus('Offline: dati salvati'+(data.aggiornato?' del '+fmtTime(data.aggiornato):''));render()}
+}
+function fmtTime(s){if(!s)return '';const d=new Date(s);return d.toLocaleDateString('it-IT',{day:'2-digit',month:'2-digit'})+' '+d.toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'})}
+let statusTxt='';function setStatus(s){statusTxt=s;const el=$('#status');if(el)el.textContent=s}
+
+/* ---------- vista ---------- */
+const match=(o,q)=>!q||[o.negozio,o.codice,o.oggetto,o.note,o.fonte,o.dove].join(' ').toLowerCase().includes(q);
+function render(){
+  const q=$('#q').value.trim().toLowerCase();
+  const B=data.buoni||[],O=data.offerte||[];
+  const active=B.filter(b=>!b.usato&&(days(b.scadenza)===null||days(b.scadenza)>=0));
+  $('#cB').textContent=active.length||'';$('#cO').textContent=O.length||'';
+  document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('on',t.dataset.tab===tab));
+  let h='';
+  if(!cfg.u)h+=`<div class="card"><b>Collega il tuo Gmail</b><div class="note">Installa lo script Apps Script e apri il link di collegamento, oppure inserisci URL e token in ⚙. Nel frattempo puoi aggiungere buoni a mano con +.</div></div>`;
+  if(q)h+=beforeBuy(q,active,O);
+  if(tab==='buoni')h+=renderBuoni(B,q);
+  else if(tab==='offerte')h+=renderOfferte(O,q);
+  else h+=renderCash();
+  h+=`<div class="status" id="status">${esc(statusTxt)}</div>`;
+  $('#main').innerHTML=h;
+}
+function beforeBuy(q,active,O){
+  const mine=active.filter(b=>match(b,q)),off=O.filter(o=>match(o,q));
+  const lety=off.filter(o=>/cashback/i.test(o.sconto));
+  const corp=off.filter(o=>/corporate|convenzion/i.test(o.fonte));
+  const items=[];
+  mine.forEach(b=>items.push(`<li><b>${esc(b.valore||'buono')}</b> ${esc(b.negozio)}${b.codice?' · <code>'+esc(b.codice)+'</code>':''}</li>`));
+  lety.forEach(o=>items.push(`<li>${esc(o.fonte)}: <b>${esc(o.sconto)}</b> su ${esc(o.negozio)}</li>`));
+  corp.forEach(o=>items.push(`<li>${esc(o.fonte)}: ${esc(o.negozio)} <b>${esc(o.sconto)}</b></li>`));
+  const name=$('#q').value.trim();
+  const portal=Object.values(data.portali||{})[0];
+  const g=s=>'https://www.google.com/search?q='+encodeURIComponent(s);
+  return `<div class="panel"><h3>Prima di comprare da «${esc(name)}»</h3>
+  ${items.length?'<ul>'+items.join('')+'</ul>':'<div class="note">Nessun buono tuo o cashback trovato per questo negozio.</div>'}
+  ${mine.some(b=>b.codice)&&lety.length?'<div class="warn">⚠ Usare un codice non LetyShops può annullare il cashback: confronta cosa conviene.</div>':''}
+  <div class="links">
+    <a class="act" target="_blank" rel="noopener" href="${g('codice sconto '+name)}">Codici pubblici</a>
+    <a class="act" target="_blank" rel="noopener" href="${g(name+' cashback site:letyshops.com')}">LetyShops</a>
+    ${portal?`<a class="act" target="_blank" rel="noopener" href="${esc(portal)}">Convenzioni aziendali</a>`:''}
+  </div></div>`;
+}
+function renderBuoni(B,q){
+  const F={attivi:b=>!b.usato&&(days(b.scadenza)===null||days(b.scadenza)>=0),scadenza:b=>!b.usato&&days(b.scadenza)!==null&&days(b.scadenza)>=0&&days(b.scadenza)<=7,usati:b=>!!b.usato,scaduti:b=>!b.usato&&days(b.scadenza)!==null&&days(b.scadenza)<0,tutti:()=>true};
+  const L={attivi:'Attivi',scadenza:'In scadenza',usati:'Usati',scaduti:'Scaduti',tutti:'Tutti'};
+  let h='<div class="chips">'+Object.keys(L).map(k=>`<button class="chip${k===filt?' on':''}" data-f="${k}">${L[k]}</button>`).join('')+'</div>';
+  const list=B.filter(F[filt]).filter(b=>match(b,q)).sort((a,b)=>(a.scadenza||'9999')<(b.scadenza||'9999')?-1:1);
+  if(!list.length)return h+`<div class="empty"><b>Niente qui</b>${filt==='attivi'?'Nessun buono attivo. Aggiungine uno con +.':'Prova un altro filtro.'}</div>`;
+  return h+list.map(b=>`<div class="card${b.usato?' used':''}">
+    <div class="row"><div class="store">${esc(b.negozio||'—')}</div>${b.valore?`<span class="val">${esc(b.valore)}</span>`:''}</div>
+    ${b.codice?`<button class="code" data-copy="${esc(b.codice)}"><b>${esc(b.codice)}</b><em>Copia</em></button>`:''}
+    <div class="meta">${expChip(b.scadenza)}${b.tipo?`<span>${esc(b.tipo)}</span>`:''}${b.usato?`<span>usato il ${esc(b.usato.split('-').reverse().join('/'))}</span>`:''}</div>
+    ${b.dove?`<div class="where">📍 ${esc(b.dove)}</div>`:''}
+    ${b.oggetto?`<div class="subj">${esc(b.oggetto)}</div>`:''}
+    ${b.note?`<div class="note">${linkify(b.note)}</div>`:''}
+    <div class="acts">
+      <button class="act${b.usato?'':' pri'}" data-used="${esc(b.id)}">${b.usato?'Rimetti attivo':'Segna usato'}</button>
+      ${b.link?`<a class="act" target="_blank" rel="noopener" href="${esc(b.link)}">Apri mail</a>`:''}
+      <button class="act" data-del="${esc(b.id)}">Elimina</button>
+    </div></div>`).join('');
+}
+function linkify(s){return esc(s).replace(/(https?:\/\/[^\s]+)/g,'<a target="_blank" rel="noopener" href="$1">apri link</a>')}
+function renderOfferte(O,q){
+  const srcs=[...new Set(O.map(o=>o.fonte))];
+  let h='<div class="chips">'+['tutte',...srcs].map(s=>`<button class="chip${(window._src||'tutte')===s?' on':''}" data-src="${esc(s)}">${esc(s==='tutte'?'Tutte':s)}</button>`).join('')+'</div>';
+  const list=O.filter(o=>(window._src||'tutte')==='tutte'||o.fonte===window._src).filter(o=>match(o,q))
+    .sort((a,b)=>a.data<b.data?1:-1);
+  if(!list.length)return h+'<div class="empty"><b>Nessuna offerta</b>Le promo cashback e le convenzioni compaiono qui dopo la scansione di Gmail.</div>';
+  return h+list.map(o=>`<div class="card">
+    <div class="src">${esc(o.fonte)}</div>
+    <div class="row"><div class="store">${esc(o.negozio)}</div>${o.sconto?`<span class="val">${esc(o.sconto)}</span>`:''}</div>
+    ${o.codice?`<button class="code" data-copy="${esc(o.codice)}"><b>${esc(o.codice)}</b><em>Copia</em></button>`:''}
+    <div class="meta">${expChip(o.scadenza)}</div>
+    ${o.note?`<div class="note">${linkify(o.note)}</div>`:''}
+    ${o.link?`<div class="acts"><a class="act" target="_blank" rel="noopener" href="${esc(o.link)}">Apri</a></div>`:''}
+  </div>`).join('');
+}
+function renderCash(){
+  const s=(data.cashback&&data.cashback.saldi)||{},ev=(data.cashback&&data.cashback.eventi)||[];
+  let h='<div class="big">'+(Object.keys(s).length?Object.entries(s).map(([k,v])=>`<div class="card"><div class="src">${esc(k)}</div><div class="n">${esc(v.saldo)} €</div><div class="note">saldo al ${esc(v.al.split('-').reverse().join('/'))}</div></div>`).join(''):'<div class="card"><div class="note">Nessun saldo cashback ancora letto.</div></div>')+'</div>';
+  const pend=ev.filter(e=>e.stato==='in sospeso');
+  if(pend.length)h+=`<div class="note" style="margin-bottom:8px">In sospeso: ${pend.map(e=>esc(e.importo)+' € '+esc(e.negozio)).join(', ')}</div>`;
+  return h+ev.map(e=>`<div class="card"><div class="row"><div class="store">${esc(e.negozio||e.servizio)}</div><span class="val">${esc(e.importo)} €</span></div>
+    <div class="meta"><span class="exp">${esc(e.stato||'—')}</span><span>${esc(e.data.split('-').reverse().join('/'))}</span><span>${esc(e.servizio)}</span></div></div>`).join('');
+}
+
+/* ---------- azioni ---------- */
+document.addEventListener('click',async ev=>{
+  const t=ev.target.closest('button,a');if(!t)return;
+  if(t.dataset.tab){tab=t.dataset.tab;render();return}
+  if(t.dataset.f){filt=t.dataset.f;render();return}
+  if(t.dataset.src){window._src=t.dataset.src;render();return}
+  if(t.dataset.copy){try{await navigator.clipboard.writeText(t.dataset.copy);toast('Codice copiato')}catch(e){toast(t.dataset.copy)}return}
+  if(t.dataset.used){
+    const b=data.buoni.find(x=>x.id===t.dataset.used);if(!b)return;
+    const v=!b.usato;b.usato=v?today():'';LS.set('data',data);render();
+    if(cfg.u)enqueue({action:'usato',id:b.id,value:v});toast(v?'Segnato come usato':'Rimesso attivo');return}
+  if(t.dataset.del){
+    if(!confirm('Eliminare questo buono?'))return;
+    data.buoni=data.buoni.filter(x=>x.id!==t.dataset.del);LS.set('data',data);render();
+    if(cfg.u)enqueue({action:'elimina',id:t.dataset.del});return}
+});
+$('#q').addEventListener('input',render);
+$('#bRefresh').onclick=load;
+$('#bAdd').onclick=()=>openAdd({});
+$('#bSettings').onclick=()=>{const f=$('#fSet');f.u.value=cfg.u;f.t.value=cfg.t;f.notif.checked=!!cfg.notif;$('#dSet').showModal()};
+$('#fSet').addEventListener('submit',async()=>{
+  const f=$('#fSet');cfg={u:f.u.value.trim(),t:f.t.value.trim(),notif:f.notif.checked};LS.set('cfg',cfg);
+  if(cfg.notif&&'Notification'in window&&Notification.permission==='default')await Notification.requestPermission();
+  load();
+});
+$('#bScan').onclick=async()=>{
+  const f=$('#fSet');cfg.u=f.u.value.trim();cfg.t=f.t.value.trim();LS.set('cfg',cfg);
+  toast('Controllo Gmail… può richiedere un minuto');
+  try{const r=await api({action:'scan'});toast(`Nuovi: ${r.nuovi.buoni} buoni, ${r.nuovi.offerte} offerte`);$('#dSet').close();load()}catch(e){toast('Errore: '+e.message)}
+};
+
+function openAdd(pre){
+  const f=$('#fAdd');f.reset();$('#pasteTxt').hidden=true;$('#ocrMsg').textContent='Per i codici dei social: fai uno screenshot o condividi il post verso Cacciabuoni.';
+  Object.entries(pre).forEach(([k,v])=>{if(f[k])f[k].value=v});
+  $('#dAdd').showModal();
+}
+function fillFromText(txt){
+  const f=$('#fAdd'),t=cleanText(txt);
+  const codes=extractCodes(t);
+  let code=codes[0]||'';
+  if(!code){const m=t.match(/\b[A-Z0-9][A-Z0-9-]{3,20}[A-Z0-9]\b/g);code=(m||[]).find(x=>/\d/.test(x)&&/[A-Z]/.test(x))||''}
+  if(code&&!f.codice.value)f.codice.value=code;
+  const v=extractValue(t);if(v&&!f.valore.value)f.valore.value=v;
+  const s=extractExpiry(t,new Date());if(s&&!f.scadenza.value)f.scadenza.value=s;
+  if(!f.note.value)f.note.value=t.replace(/\s+/g,' ').slice(0,140);
+  $('#ocrMsg').textContent=code?'Codice trovato: controlla i campi.':'Nessun codice riconosciuto: completalo a mano.';
+}
+$('#bPaste').onclick=async()=>{
+  const ta=$('#pasteTxt');ta.hidden=false;
+  try{const c=await navigator.clipboard.readText();if(c){ta.value=c;fillFromText(c)}}catch(e){ta.focus()}
+};
+$('#pasteTxt').addEventListener('change',e=>fillFromText(e.target.value));
+$('#ocrIn').addEventListener('change',async e=>{
+  const file=e.target.files[0];if(!file)return;
+  $('#ocrMsg').textContent='Lettura immagine… (la prima volta scarica il motore OCR)';
+  try{
+    if(!window.Tesseract)await new Promise((ok,ko)=>{const s=document.createElement('script');s.src='https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js';s.onload=ok;s.onerror=ko;document.head.appendChild(s)});
+    const r=await Tesseract.recognize(file,'ita+eng');
+    fillFromText(r.data.text);
+  }catch(err){$('#ocrMsg').textContent='OCR non riuscito: inserisci i dati a mano.'}
+});
+$('#fAdd').addEventListener('submit',e=>{
+  if(e.submitter&&e.submitter.value!=='ok')return;
+  const f=$('#fAdd');
+  const item={id:'L'+Date.now(),data:today(),negozio:f.negozio.value.trim(),codice:f.codice.value.trim(),valore:f.valore.value.trim(),scadenza:f.scadenza.value,dove:f.dove.value.trim(),note:f.note.value.trim(),tipo:'manuale',usato:'',fonte:'Manuale',link:'',oggetto:''};
+  if(!item.negozio)return;
+  data.buoni.push(item);LS.set('data',data);tab='buoni';filt='attivi';render();toast('Buono salvato');
+  if(cfg.u)enqueue({action:'aggiungi',item});
+});
+
+/* ---------- notifiche locali ---------- */
+async function notify(){
+  if(!cfg.notif||!('Notification'in window)||Notification.permission!=='granted')return;
+  if(LS.get('notifDay','')===today())return;
+  const due=(data.buoni||[]).filter(b=>!b.usato&&[0,1].includes(days(b.scadenza)));
+  if(!due.length)return;
+  const body=due.map(b=>`${b.negozio} ${b.valore||''} (${days(b.scadenza)===0?'oggi':'domani'})`).join('\n');
+  try{const reg=await navigator.serviceWorker.ready;reg.showNotification(`${due.length} buoni in scadenza`,{body,icon:'icon-192.png',tag:'scadenze'})}catch(e){new Notification('Buoni in scadenza',{body})}
+  LS.set('notifDay',today());
+}
+
+
+/* ---------- scorciatoie da tastiera (PC) ---------- */
+document.addEventListener('keydown',e=>{
+  if(e.target.matches('input,textarea'))return;
+  if(e.key==='/'){e.preventDefault();$('#q').focus()}
+  else if(e.key==='n'){e.preventDefault();openAdd({})}
+  else if(e.key==='r'){e.preventDefault();load()}
+  else if(['1','2','3'].includes(e.key)){tab=['buoni','offerte','cashback'][+e.key-1];render()}
+});
+$('#q').addEventListener('keydown',e=>{if(e.key==='Escape'){e.target.value='';e.target.blur();render()}});
+
+/* ---------- avvio ---------- */
+(function init(){
+  const h=new URLSearchParams(location.hash.slice(1));
+  if(h.get('u')&&h.get('t')){cfg.u=h.get('u');cfg.t=h.get('t');LS.set('cfg',cfg);history.replaceState(null,'',location.pathname);toast('Collegato a Gmail')}
+  const s=new URLSearchParams(location.search);
+  const shared=[s.get('title'),s.get('text'),s.get('url')].filter(Boolean).join('\n');
+  render();
+  if(shared){history.replaceState(null,'',location.pathname);openAdd({});$('#pasteTxt').hidden=false;$('#pasteTxt').value=shared;fillFromText(shared)}
+  load();
+  window.addEventListener('online',flush);
+  if('serviceWorker'in navigator&&location.protocol.startsWith('http'))navigator.serviceWorker.register('sw.js').catch(()=>{});
+})();
+</script>
+</body>
+</html>
